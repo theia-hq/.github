@@ -1,30 +1,45 @@
-# Reach a public key, prove you're allowed, run a service at it.
+# Grant scoped access to a service, rooted in your key, with no coordinator to trust.
 
-Give a machine another machine's public key and it opens a private, authenticated byte-stream to that
-exact key, over any transport, across any NAT. You address _who_, not _where_. On top of that one reach,
-a node runs named services (a shell, a file, an HTTP fetch, link diagnostics), each gated so only people
-you allow can use it. That is the whole idea, and every tool here is one instance of it.
+You run a named service on your machine (a shell, a file, an HTTP fetch, link diagnostics), and you
+hand someone a signed grant to reach exactly that one service. The grant expires on its own, the holder
+can narrow it and pass it on without asking you, and you can revoke it at any time. Nothing in the
+middle checks it: it verifies offline against your key alone, with no server, no account, and no
+coordinator in the trust path. That is the whole idea, and every tool here is one instance of it.
 
-## The foundation: two primitives
+Reaching a peer is table stakes now. Anyone can open an encrypted, NAT-traversing pipe to a public key
+with no coordinator (even Tailscale unbundled it, as `tailcat`). What that pipe alone cannot give you
+is a *gate*: a way to publish a stable address, run something behind it forever, admit your own devices
+and your delegates by name, and cut one of them off without moving the address or disturbing anyone
+else. That gate, and the grants that pass it, is what lives here.
 
-Everything stands on two things. Nothing above them works without both, and together they are the entire
-trust story: no server, no account, no coordinator in the path.
+## The foundation: reach, then the gate
+
+Everything stands on two things: reaching a key, and deciding who gets in. The first is table stakes;
+the second is the point.
+
+**A gate, and grants that pass it.** Reaching a peer is not permission to use it. Every service sits
+behind a gate that verifies offline against your own identity, with nothing to phone home to, and rules
+yes or no for one specific service. Your devices carry a badge you signed; a friend carries a scoped
+grant you handed them. Both are checked against your key alone.
+
+| | |
+| --- | --- |
+| [nauthy](https://github.com/theia-hq/nauthy) | The gate at the door. An identity you own admits your own devices and anyone you delegate to, through signed tokens that are expiring, revocable, and can only be narrowed, never widened. No server, no PKI, no allowlist to sync. |
 
 **Reach.** Give it an ed25519 public key and it opens a mutually authenticated, encrypted,
-NAT-traversing byte-stream to exactly that key. The transport underneath is swappable and the same key
-reaches the same peer whichever one you pick.
+NAT-traversing byte-stream to exactly that key. You address _who_, not _where_. The transport underneath
+is swappable and the same key reaches the same peer whichever one you pick.
 
 | | |
 | --- | --- |
 | [bifrost](https://github.com/theia-hq/bifrost) | Address a peer by its public key over any transport. Backends: iroh (internet, relay-backed), our own quirk, and an in-process one for tests. |
 | [quirk](https://github.com/theia-hq/quirk) | Our own QUIC over UDP, written from scratch to own the internals. It passes the same conformance suite as iroh. |
 
-**Auth.** Reaching a peer is not permission to use it. The gate verifies offline against your own
-identity, with nothing to phone home to, and rules yes or no for a specific service.
-
-| | |
-| --- | --- |
-| [nauthy](https://github.com/theia-hq/nauthy) | The gate at the door. An identity you own admits your own devices and anyone you delegate to, through signed tokens that are expiring, revocable, and can only be narrowed, never widened. No server, no PKI, no allowlist to sync. |
+**The honest limit.** A leaked grant is still a bearer token: whoever holds an unexpired, un-revoked
+grant gets that one service until it expires or you revoke it. The win is that expiry and revocation
+exist as backstops, that a grant is scoped to one service and not your whole machine, and that you can
+mint a separate one per person. Mint one grant that never expires and share it like a password and you
+have thrown that away.
 
 ## The services: what stands on the foundation
 
