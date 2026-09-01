@@ -94,7 +94,6 @@ whichever transport you pick)
 | --- | --- |
 | [swoosh](https://github.com/theia-hq/swoosh) | The one CLI: reach a key, measure the link, ssh in, fetch through a peer, push files, serve and share services. |
 | [tightbeam](https://github.com/theia-hq/tightbeam) | The forward primitive and the registry a node serves its services from. |
-| [sshh](https://github.com/theia-hq/sshh) | The keyless SSH server: hand it an authorized stream, it runs the shell. |
 
 **Stand up a node**
 | | |
