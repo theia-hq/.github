@@ -2,6 +2,8 @@
 
 **You are your key. Your services are you. Your only authority.**
 
+*WireGuard keys, capability tokens, no control plane.*
+
 You run a named service on your machine (a shell, a file, an HTTP fetch, link diagnostics), and you
 hand someone a signed grant to reach exactly that one service. The grant expires on its own, the holder
 can narrow it and pass it on without asking you, and you can revoke it at any time. Nothing in the
