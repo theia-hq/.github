@@ -52,10 +52,12 @@ The friendly verbs (`ssh`, `fetch`, `ping`, `speed`) are shortcuts: each names o
 | HTTP fetch (`fetch:`) | The node fetches a URL for you and streams it back, TLS terminated at the node, scoped to the URL asked for. |
 | link diagnostics (`ping:` / `speed:`) | Round-trip time and throughput to a peer, addressed by key. |
 | a file or a pipe (`file:` / `fifo:`) | A path's raw bytes, streamed to the peer: a static file, or a live feed written into a named pipe. |
+| push a file (`beam:`) | Send a file or directory to a peer, hashed end to end so a truncated or tampered transfer is rejected. |
 | a raw forward | Bind any local `host:port` or Unix socket and reach it as a local port on another machine. |
 
-*Coming: `call` (invoke any named service, the long form the friendly verbs shortcut), and a lifecycle
-service (ask a node its status, or tell it to shut down) over the same reach + auth machine.*
+Stop a node you run with `swoosh stop`, or bound its lifetime up front with `serve --for 30m`. *Coming:
+`call` (invoke any named service, the long form the friendly verbs shortcut) and the rest of a node's
+status surface, over the same reach + auth machine.*
 
 ## Try it
 
@@ -90,10 +92,9 @@ whichever transport you pick)
 **Services and the CLI**
 | | |
 | --- | --- |
-| [swoosh](https://github.com/theia-hq/swoosh) | The one CLI: reach a key, measure the link, ssh in, fetch through a peer, serve and share services. |
+| [swoosh](https://github.com/theia-hq/swoosh) | The one CLI: reach a key, measure the link, ssh in, fetch through a peer, push files, serve and share services. |
 | [tightbeam](https://github.com/theia-hq/tightbeam) | The forward primitive and the registry a node serves its services from. |
 | [sshh](https://github.com/theia-hq/sshh) | The keyless SSH server: hand it an authorized stream, it runs the shell. |
-| [iris](https://github.com/theia-hq/iris) | Send files to a key, verified end to end. |
 
 **Stand up a node**
 | | |
