@@ -1,4 +1,6 @@
-# Grant scoped access to a service, rooted in your key, with no coordinator to trust.
+# Publish your address. Keep the keys to the door.
+
+**You are your key. Your services are you. Your only authority.**
 
 You run a named service on your machine (a shell, a file, an HTTP fetch, link diagnostics), and you
 hand someone a signed grant to reach exactly that one service. The grant expires on its own, the holder
