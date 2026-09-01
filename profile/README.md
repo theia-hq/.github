@@ -11,7 +11,8 @@ middle checks it: it verifies offline against your key alone, with no server, no
 coordinator in the trust path. That is the whole idea, and every tool here is one instance of it.
 
 Reaching a peer is table stakes now. Anyone can open an encrypted, NAT-traversing pipe to a public key
-with no coordinator (even Tailscale unbundled it, as `tailcat`). What that pipe alone cannot give you
+with no coordinator; even Tailscale came to the same conclusion, shipping
+[`tailcat`](https://tailscale.com/blog/tailcat): their data plane, without their control plane. What that pipe alone cannot give you
 is a *gate*: a way to publish a stable address, run something behind it forever, admit your own devices
 and your delegates by name, and cut one of them off without moving the address or disturbing anyone
 else. That gate, and the grants that pass it, is what lives here.
