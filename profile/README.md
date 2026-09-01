@@ -1,6 +1,6 @@
 # Publish your address. Keep the keys to the door.
 
-**You are your key. Your services are you. Your only authority.**
+**You are your key. Your services are you. You're the only authority.**
 
 *WireGuard keys, capability tokens, no control plane.*
 
