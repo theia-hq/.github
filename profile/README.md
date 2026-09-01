@@ -32,6 +32,14 @@ Against the tools you already use:
   know the peer, it is a key, so all of that disappears: addressing is the key, membership is a signature,
   and two peers talk with no distributed system to stand up first.
 
+## The trust is in the math
+
+Every one of those tools makes you trust an operator: to stay up, to stay honest, to not be breached or compelled. Here the only operator is you: no third party to stay up, stay honest, or be compelled. Membership is a signature. It verifies against a key on your own machine, offline, or it does not.
+
+What you are trusting is the cryptographic primitive underneath, not a server behaving or a database being right. It is the same bet as a zero-knowledge proof: you verify it yourself, offline, with no operator in the loop. Believe the math, not the middleman.
+
+And it is math the whole field already trusts. We did not invent our own cryptography for you to take on faith. Identity is a plain ed25519 signature, boring by design; admission is a capability token (biscuit), a decades-old access-control pattern. Both are studied and older than this project, on purpose, so the answer to "why is this safe" is never "because we were clever."
+
 ## Nothing to take away
 
 Your identity is not a row in someone's database. It is a key you hold. There is no account to register,
