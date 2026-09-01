@@ -105,10 +105,12 @@ whichever transport you pick)
 
 ## Where we're going
 
-The next canvas is running code at a key: a function you `call` by public key, woken by the reach,
-metered while it runs, back to nothing when you leave. Same foundation, same gate, a new kind of service
-behind it. Named but not started: presence, self-owned storage, region-picked egress over your own trust
-graph, and pubkey-native names you can type into any app.
+The end goal is a private network whose control plane and exits are your OWN machines, not a vendor's:
+a mesh where the roster of who belongs, and the nodes traffic leaves through, are members you run. No
+account sits behind it, so it is yours to inherit or fork, and no company can hold it hostage or lose it.
+The first step we've designed is the piece nobody ships: a fresh device joins the fleet by learning a
+member list one of your own nodes serves, signed by your key, that no vendor ever held. Add a machine and
+it knows the others, with nothing to copy by hand. Designed, not yet built.
 
 ---
 
