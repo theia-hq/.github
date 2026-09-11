@@ -8,8 +8,8 @@ rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is a
 suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
 machine.
 
-The proposition is against the compromise itself, and you do not have to run a box for it to matter.
-Any two people can run a service between them, with no account, no middle, and no rented permission.
+The proposition is against the compromise itself: any two people can run a service between them, with
+no account, no middle, and no rented permission.
 
 ## It ends with you
 
