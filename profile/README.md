@@ -9,7 +9,7 @@ vendor can suspend, and access is a bearer secret someone can lose. You are rent
 your own machine.
 
 The proposition is against the compromise itself: any two people can run a service between them, with
-no account, no middle, and no rented permission.
+no account, no control plane, and no rented permission.
 
 ## It ends with you
 
