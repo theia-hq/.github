@@ -3,10 +3,10 @@
 Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
 account, no control plane, nothing in the middle.
 
-Today, reaching your own machine means one of three things: run a control plane (Tailscale, headscale),
-rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a vendor can
-suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
-machine.
+Today, reaching machines means compromising in one of three ways: run a control plane (Tailscale,
+headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a
+vendor can suspend, and access is a bearer secret someone can lose. You are renting the front door to
+your own machine.
 
 The proposition is against the compromise itself: any two people can run a service between them, with
 no account, no middle, and no rented permission.
