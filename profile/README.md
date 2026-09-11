@@ -1,8 +1,22 @@
-# Reach a machine by its public key, with no account and no control plane.
+# You are your key.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
-```
+Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
+account, no control plane, nothing in the middle.
+
+Today, reaching a box you own means one of three things: run a control plane (Tailscale, headscale),
+rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a vendor can
+suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
+machine.
+
+This is for people who run their own boxes: a homelab, a family, a small team, CI runners, agents.
+
+## It ends with you
+
+Your identity is a key you hold, not a row in someone's database. There is no account to register and
+no dashboard to open, so nothing to suspend, migrate, or delete. `swoosh serve --expires 30m` reaps
+itself when the timer runs out; there was never an account to deregister.
+
+> **No company can deplatform what has no account.**
 
 Every service sits behind a gate. Your own machines and the people you admit get in with a signature
 from your key. Everyone else is refused:
@@ -10,9 +24,18 @@ from your key. Everyone else is refused:
 > bf01hwttmgsklixr via quirk: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
 <!-- captured from swoosh/docs/demo.md (scripts/demo.sh) -->
 
+## Get it
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
+```
+
 ## What you get in 60 seconds
 
-<!-- Captured 2026-09-11 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; the ping path line is omitted. -->
+Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
+cut at any time. The commands below ran against the released binary:
+
+<!-- Captured 2026-09-11 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; the serve banner is trimmed to the readiness key and the served services, and the ping path line is omitted. -->
 
 Serve on the machine you want to reach:
 
@@ -22,17 +45,10 @@ swoosh ready
 
     bf013m24wpob5axozjmmzv2w3nikjto6nllmwpfiuij7qemsrd3m4hgq
 
-how peers reach you
-  internet   automatic; peers reach you by the key above, even across NATs
-  LAN        automatic; your devices just need the key (mDNS)
-
 serving
   family-gated   your devices + peers you've granted
     ping          round-trip probe
     ssh -> sshd   a shell on this machine
-    control.*     node control (never public)
-
-ctrl-c to stop
 ```
 
 Enroll a second machine (`swoosh mint` on the first, `swoosh adopt` on the second), then reach the first
@@ -66,14 +82,6 @@ revoked 1 grant(s) to bf014hag2b3nqbyt… (…/revoked)
 First reach, the whole model, every verb: [getting started](https://github.com/theia-hq/swoosh/blob/main/docs/getting-started.md),
 [keys](https://github.com/theia-hq/swoosh/blob/main/docs/keys.md),
 [commands](https://github.com/theia-hq/swoosh/blob/main/docs/reference/commands.md).
-
-## It ends with you
-
-Your identity is a key you hold, not a row in someone's database. There is no account to register, no
-dashboard to open, nothing to suspend or delete. `swoosh serve --expires 30m` reaps itself when the timer
-runs out, and there was never an account to deregister.
-
-> **No company can deplatform what has no account.**
 
 ## Compared to what you already use
 
