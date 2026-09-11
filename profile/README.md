@@ -22,7 +22,7 @@ Services sit behind a gate by default. Your own machines and the people you admi
 signature from your key. Everyone else is refused:
 
 > bf01hcq6balrlxwa via iroh: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
-<!-- captured from swoosh/docs/capabilities.md (branch docs/capabilities) -->
+<!-- captured from swoosh/docs/capabilities.md -->
 
 Opening one to anyone takes a deliberate `--public`; a shell can never be public.
 
@@ -170,6 +170,7 @@ A bare grant is a bearer token: whoever holds an unexpired, un-revoked one gets 
 issue those scoped and short. A bound one (`--for`) is theft-resistant: a stolen copy only works from a
 device it is bound to, or a device the bound signet vouches for. A revoke is node-local and does not cut
 a session already open. Reaching across the internet falls back to iroh's public relays when a direct
-path fails; they forward encrypted bytes, cannot read them or admit anyone, and you can self-host them.
-quirk has no Noise handshake yet, so its identity is nominal, not proven crypto. Wire protocols, CLIs,
-and identity formats will change; not for production yet.
+path fails; they forward encrypted bytes and cannot read them or admit anyone, but they can see who talks
+to whom and can drop traffic, and you can self-host them. quirk has no Noise handshake yet, so its
+identity is nominal, not proven crypto. Wire protocols, CLIs, and identity formats will change; not for
+production yet.
