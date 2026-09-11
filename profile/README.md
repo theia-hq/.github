@@ -28,12 +28,12 @@ Opening one to anyone takes a deliberate `--public`; a shell can never be public
 
 ## The family
 
-[bifrost](https://github.com/theia-hq/bifrost) is the transport. It addresses a peer by its ed25519
-key and opens a stream; the transport underneath is swappable. Today that is iroh, QUIC with NAT
-traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
-QUIC written from scratch. Most readers will never touch quirk; we wrote it to understand how this
-layer works. One limit today: both ends have to be online and findable for NAT traversal to connect
-them, and transports that do not need that are where this goes next.
+[bifrost](https://github.com/theia-hq/bifrost) is how a peer is reached. It addresses the peer by its
+ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh, QUIC with
+NAT traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
+QUIC written from scratch. Most readers will never touch quirk; we wrote it to understand how this layer
+works. One limit today: both ends have to be online and findable for NAT traversal to connect them, and
+transports that do not need that are where this goes next.
 
 [nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your
 key, checked offline against the key that dialed. The trust is in the math, and the math is standard
