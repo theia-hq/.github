@@ -1,7 +1,7 @@
 # You are your key.
 
 Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
-account, no control plane, nothing to rent.
+account, no control plane, no one's permission.
 
 Today, reaching machines means compromising in one of three ways: run a control plane (Tailscale,
 headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a
@@ -18,13 +18,17 @@ no dashboard to open, so nothing to suspend, migrate, or delete.
 
 > **No company can deplatform what has no account.**
 
-Every service sits behind a gate. Your own machines and the people you admit get in with a signature
-from your key. Everyone else is refused:
+Services sit behind a gate by default. Your own machines and the people you admit get in with a
+signature from your key. Everyone else is refused:
 
-> bf01hwttmgsklixr via quirk: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
-<!-- captured from swoosh/docs/demo.md (scripts/demo.sh) -->
+> bf01hcq6balrlxwa via iroh: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
+<!-- captured from swoosh/docs/capabilities.md (branch docs/capabilities) -->
+
+Opening one to anyone takes a deliberate `--public`; a shell can never be public.
 
 ## Get it
+
+Install (pre-1.0, not for production yet):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
@@ -35,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/instal
 Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
 cut at any time. The commands below ran against the released binary:
 
-<!-- Captured 2026-09-11 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; the serve banner is trimmed to the readiness key and the served services, and the ping path line is omitted. -->
+<!-- Captured 2026-09-11 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; the serve banner is trimmed to the readiness key and the operator-served rows; the reach section, the control row, and the stop line are omitted. The ping path line is omitted. -->
 
 Serve on the machine you want to reach:
 
@@ -51,19 +55,21 @@ serving
     ssh -> sshd   a shell on this machine
 ```
 
-Enroll a second machine (`swoosh mint` on the first, `swoosh adopt` on the second), then reach the first
+Enroll a second machine (`swoosh mint` on the first, `swoosh adopt` on the second; [getting
+started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md)), then reach the first
 by the key it printed:
 
 ```console
-$ swoosh ping bf013m24wpob5axo
+$ swoosh ping bf013m24wpob5axozjmmzv2w3nikjto6nllmwpfiuij7qemsrd3m4hgq
   4 sent, 4 received, 0% loss
   rtt min/avg/max/mdev = 2.139/179.306/266.663/88.583 ms
 
-$ swoosh ssh bf013m24wpob5axo -- echo hello
+$ swoosh ssh bf013m24wpob5axozjmmzv2w3nikjto6nllmwpfiuij7qemsrd3m4hgq -- echo hello
 hello
 ```
 
-Grant one person one service for 14 days, then revoke it:
+`signet` is the local name you gave a key; `fleet` is the set of devices that key vouches for. Grant one
+person one service for 14 days, then revoke it:
 
 ```console
 $ swoosh contact signet contractor bf014hag2b3nqbyt…
@@ -79,21 +85,24 @@ $ swoosh grant revoke bf014hag2b3nqbyt
 revoked 1 grant(s) to bf014hag2b3nqbyt… (…/revoked)
 ```
 
-First reach, the whole model, every verb: [getting started](https://github.com/theia-hq/swoosh/blob/main/docs/getting-started.md),
-[keys](https://github.com/theia-hq/swoosh/blob/main/docs/keys.md),
-[commands](https://github.com/theia-hq/swoosh/blob/main/docs/reference/commands.md).
+First reach, the whole model, every verb: [getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md),
+[keys](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/keys.md),
+[commands](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/reference/commands.md).
 
 ## Compared to what you already use
 
 - **vs Tailscale (rented) or headscale (self-hosted).** Reach works in both, but who you are and who is
   allowed resolve against a control plane, rented or self-hosted: a server, a database of who belongs,
   state to run, secure, and back up. Here admission is a signature your own key already vouches for,
-  checked offline, with no coordinator in the path.
+  checked offline, with no coordinator in the trust path.
+- **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress, TLS, domains, browser access, and a free
+  tier. The edge sits in the vendor's trust path, and the service is theirs to cut. Here the service runs
+  on your machine behind your key; the endpoint is a key, not a rented hostname.
 - **vs iroh.** It reaches an ed25519 key over QUIC, then stops: no gate, no roster. This is that reach
   plus the missing half. (bifrost-iroh is iroh underneath; this is the layer iroh chose not to be.)
 - **vs libp2p.** libp2p is a toolkit for a swarm: a DHT, pubsub, multiaddrs, transport negotiation, most
   of it for discovering peers you do not know. You already know the peer, it is a key, so none of that is
-  needed: addressing is the key, admission is a signature.
+  needed: addressing is the key.
 
 ## The family
 
@@ -109,9 +118,9 @@ install.
 
 | | |
 | --- | --- |
-| [bifrost](https://github.com/theia-hq/bifrost) | Reach. Address a peer by its ed25519 key and open a byte stream, wherever it is, across NATs, without knowing its address. Backends: iroh (QUIC with NAT hole-punching), our own quirk, and an in-process one for tests. It gives the connection and nothing more. |
+| [bifrost](https://github.com/theia-hq/bifrost) | Reach. Address a peer by its ed25519 key and open a byte stream, wherever it is, across NATs, without knowing its address. Backends: iroh (QUIC with NAT hole-punching and public relays), our own quirk, and an in-process one for tests. It gives the connection and nothing more. |
 | [quirk](https://github.com/theia-hq/quirk) | Our own QUIC over UDP, written from scratch: connections, reliable streams, and datagrams by hand. One of bifrost's backends, and it passes the same conformance suite as iroh. |
-| [nauthy](https://github.com/theia-hq/nauthy) | The gate. Capability tokens rooted at one key you hold: mint a grant for one service, narrow it, pass it on, revoke it. Every grant carries an expiry and a revocation id, checked offline against the key the peer already dialed with. No server, no PKI, no allowlist to sync. |
+| [nauthy](https://github.com/theia-hq/nauthy) | The gate. Capability tokens rooted at one key you hold. Mint a grant (bearer or bound): a bearer one can be narrowed and passed on; either can be revoked. Every grant carries an expiry and a revocation id, checked offline against the key the peer already dialed with. No server, no PKI, no allowlist to sync. |
 | [tightbeam](https://github.com/theia-hq/tightbeam) | The service runtime. A machine exposes local services under its key, each behind a gate; an admitted peer gets a raw bidirectional stream to one named service. Anything that speaks over a TCP port or Unix socket rides it unchanged. It ships no services of its own; you embed it and supply them. |
 | [swoosh](https://github.com/theia-hq/swoosh) | The assembly. One install, one binary: serve services, reach a key, measure the link, ssh in (a keyless shell, membership is the login), send files, forward ports, fetch through a peer, share access. It wires bifrost, nauthy, and tightbeam together. |
 
@@ -119,8 +128,8 @@ install.
 
 | | |
 | --- | --- |
-| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell, HTTP fetch, and link diagnostics behind the family gate, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
-| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: dormant until you dial it, one running machine while you're in, gone when you leave. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
+| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell and link diagnostics behind the family gate, with HTTP fetch opt-in, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
+| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: summoned on demand, up for the minutes you set, gone on `swoosh stop` or at the timer. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
 
 ## What the model makes possible
 
@@ -133,34 +142,34 @@ without re-keying anyone. A grant names one service, so an admitted person reach
 nothing else. Who belongs is a signature checked against the key the peer already dialed with. Who is
 cut off is a denial your own machine writes.
 
-The same node runs on a laptop, a runner, or an on-demand machine. The tools above put identity and
-permission in a control plane, rented or self-hosted. Here both live in the key, so no company can
+The same node runs on a laptop, a runner, or an on-demand machine. Tailscale and headscale put identity
+and permission in a control plane, rented or self-hosted. Here both live in the key, so no company can
 suspend them.
 
 ## Try it
 
 Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases), or run the install
-one-liner above.
+one-liner above. The install script gives the current release; the links above pin its docs.
 
-Need a machine to try it against? [qat](https://github.com/theia-hq/qat) is a template for an on-demand
-machine: dormant until you dial it, gone when you leave.
+Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
 
-Full walkthrough with captured output: [swoosh/docs/demo.md](https://github.com/theia-hq/swoosh/blob/main/docs/demo.md).
+Full walkthrough with captured output: [swoosh/docs/demo.md](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/demo.md).
 
 ## Prior art
 
-Even Tailscale conceded the split. They shipped [`tailcat`](https://tailscale.com/blog/tailcat), their
-data plane with the control plane stripped out, so you reach a peer with no coordinator. The moment you
-want a gate back, who is allowed and who you are, they hand you nothing and you are operating a control
-plane again. Theia keeps the gate and the roster in the same key that does the reach.
+Tailscale shipped [`tailcat`](https://tailscale.com/blog/tailcat), their data plane with the control
+plane stripped out: it reaches a peer with no coordinator, but membership is a flat static nodekey list,
+with no names, expiry, revocation, or scoped services. They hand you no revocable membership.
 
-The cryptography is not ours: identity is a plain ed25519 signature, admission a capability token
-(biscuit), both older than this project. Nothing here asks you to trust a new cipher.
+The cryptography is not ours: identity is a plain ed25519 key; the credential is a signature. Theia roots
+the gate and the roster in a key you own, not a separate control plane.
 
 ---
 
 A bare grant is a bearer token: whoever holds an unexpired, un-revoked one gets that one service, so
-mint those scoped and short. A bound one (--for) is theft-resistant: a stolen copy only works from the
-key it is bound to. A revoke is node-local and does not cut a session already open. quirk has no Noise
-handshake yet, so its identity is nominal, not proven crypto. Wire protocols, CLIs, and identity
-formats will change; not for production yet.
+issue those scoped and short. A bound one (`--for`) is theft-resistant: a stolen copy only works from a
+device it is bound to, or a device the bound signet vouches for. A revoke is node-local and does not cut
+a session already open. Reaching across the internet falls back to iroh's public relays when a direct
+path fails; they forward encrypted bytes, cannot read them or admit anyone, and you can self-host them.
+quirk has no Noise handshake yet, so its identity is nominal, not proven crypto. Wire protocols, CLIs,
+and identity formats will change; not for production yet.
