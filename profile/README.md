@@ -1,7 +1,7 @@
 # You are your key.
 
 Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
-account, no control plane, nothing in the middle.
+account, no control plane, nothing to rent.
 
 Today, reaching machines means compromising in one of three ways: run a control plane (Tailscale,
 headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a
@@ -14,8 +14,7 @@ no account, no control plane, and no rented permission.
 ## It ends with you
 
 Your identity is a key you hold, not a row in someone's database. There is no account to register and
-no dashboard to open, so nothing to suspend, migrate, or delete. `swoosh serve --expires 30m` reaps
-itself when the timer runs out; there was never an account to deregister.
+no dashboard to open, so nothing to suspend, migrate, or delete.
 
 > **No company can deplatform what has no account.**
 
@@ -31,7 +30,7 @@ from your key. Everyone else is refused:
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
 ```
 
-## What you get in 60 seconds
+## Serve, reach, grant, revoke
 
 Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
 cut at any time. The commands below ran against the released binary:
@@ -125,15 +124,15 @@ Grouped by what each one does.
 | | |
 | --- | --- |
 | [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: ssh in, fetch through it, run diagnostics against it, across GitHub's NAT. |
-| [qat](https://github.com/theia-hq/qat) | An example you can stand up yourself: an on-demand box, dormant until you dial it, one running machine while you're in, gone when you leave. |
+| [qat](https://github.com/theia-hq/qat) | An example you can stand up yourself: an on-demand machine, dormant until you dial it, one running machine while you're in, gone when you leave. |
 
 ## Try it
 
 Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases), or run the install
 one-liner above.
 
-Need a box to try it against? [qat](https://github.com/theia-hq/qat) is a template for an on-demand box:
-dormant until you dial it, gone when you leave.
+Need a machine to try it against? [qat](https://github.com/theia-hq/qat) is a template for an on-demand
+machine: dormant until you dial it, gone when you leave.
 
 Full walkthrough with captured output: [swoosh/docs/demo.md](https://github.com/theia-hq/swoosh/blob/main/docs/demo.md).
 
