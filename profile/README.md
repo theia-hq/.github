@@ -3,7 +3,7 @@
 Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
 account, no control plane, nothing in the middle.
 
-Today, reaching a box you own means one of three things: run a control plane (Tailscale, headscale),
+Today, reaching your own machine means one of three things: run a control plane (Tailscale, headscale),
 rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a vendor can
 suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
 machine.
