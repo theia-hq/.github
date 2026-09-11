@@ -26,6 +26,42 @@ signature from your key. Everyone else is refused:
 
 Opening one to anyone takes a deliberate `--public`; a shell can never be public.
 
+## The family
+
+Start with a transport. [bifrost](https://github.com/theia-hq/bifrost) reaches a peer by its ed25519
+key, wherever it is, across NATs, without knowing its address. It carries two backends that matter
+here: iroh, a QUIC with NAT hole-punching and public relays, and
+[quirk](https://github.com/theia-hq/quirk), our own QUIC written from scratch.
+
+Now you can be reached. Who gets in? [nauthy](https://github.com/theia-hq/nauthy) is the gate. It
+decides offline, against the key that just dialed, whether a peer may use one service. A grant is
+scoped to one service, expiring, revocable, and delegable; a bearer one can be narrowed and passed on,
+a bound one cannot, and either can be revoked. There is no server to ask and no PKI.
+
+With reach and a gate, services stand up. [tightbeam](https://github.com/theia-hq/tightbeam) exposes
+local services under that key and hands an admitted peer a raw stream to one named service. It ships
+no services of its own; you embed it and supply them.
+
+[swoosh](https://github.com/theia-hq/swoosh) is where it all arrives as one product: one CLI, one
+install. Serve a service, reach a key, measure the link, ssh in, send files, forward ports, fetch
+through a peer, share access. The transport, the gate, and the runtime come with it, already working
+together.
+
+| | |
+| --- | --- |
+| [bifrost](https://github.com/theia-hq/bifrost) | Transport: reach a peer by key. |
+| [quirk](https://github.com/theia-hq/quirk) | Our own QUIC, one bifrost backend. |
+| [nauthy](https://github.com/theia-hq/nauthy) | The gate: offline capability tokens. |
+| [tightbeam](https://github.com/theia-hq/tightbeam) | The service runtime: a stream to a named service. |
+| [swoosh](https://github.com/theia-hq/swoosh) | The CLI: the whole stack in one install. |
+
+**Ready-made nodes**
+
+| | |
+| --- | --- |
+| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell and link diagnostics behind the family gate, with HTTP fetch opt-in, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
+| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: summoned on demand, up for the minutes you set, gone on `swoosh stop` or at the timer. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
+
 ## Get it
 
 Install (pre-1.0, not for production yet):
@@ -33,6 +69,10 @@ Install (pre-1.0, not for production yet):
 ```sh
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
 ```
+
+Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases) instead if you
+prefer. The install script gives the current release; the doc links below pin its docs. Use
+[qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
 
 ## Serve, reach, grant, revoke
 
@@ -87,49 +127,8 @@ revoked 1 grant(s) to bf014hag2b3nqbyt… (…/revoked)
 
 First reach, the whole model, every verb: [getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md),
 [keys](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/keys.md),
-[commands](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/reference/commands.md).
-
-## Compared to what you already use
-
-- **vs Tailscale (rented) or headscale (self-hosted).** Reach works in both, but who you are and who is
-  allowed resolve against a control plane, rented or self-hosted: a server, a database of who belongs,
-  state to run, secure, and back up. Here admission is a signature your own key already vouches for,
-  checked offline, with no coordinator in the trust path.
-- **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress, TLS, domains, browser access, and a free
-  tier. The edge sits in the vendor's trust path, and the service is theirs to cut. Here the service runs
-  on your machine behind your key; the endpoint is a key, not a rented hostname.
-- **vs iroh.** It reaches an ed25519 key over QUIC, then stops: no gate, no roster. This is that reach
-  plus the missing half. (bifrost-iroh is iroh underneath; this is the layer iroh chose not to be.)
-- **vs libp2p.** libp2p is a toolkit for a swarm: a DHT, pubsub, multiaddrs, transport negotiation, most
-  of it for discovering peers you do not know. You already know the peer, it is a key, so none of that is
-  needed: addressing is the key.
-
-## The family
-
-Three responsibilities compose. Reach is [bifrost](https://github.com/theia-hq/bifrost), with
-[quirk](https://github.com/theia-hq/quirk) as our own QUIC backend: it opens a connection to an ed25519
-key over any transport. The gate is [nauthy](https://github.com/theia-hq/nauthy): it decides offline,
-against that same key, whether a peer may use one service. The service runtime is
-[tightbeam](https://github.com/theia-hq/tightbeam): it hands an admitted peer a raw stream to a named
-service. [swoosh](https://github.com/theia-hq/swoosh) is where they come together, one CLI and one
-install.
-
-**The stack**
-
-| | |
-| --- | --- |
-| [bifrost](https://github.com/theia-hq/bifrost) | Reach. Address a peer by its ed25519 key and open a byte stream, wherever it is, across NATs, without knowing its address. Backends: iroh (QUIC with NAT hole-punching and public relays), our own quirk, and an in-process one for tests. It gives the connection and nothing more. |
-| [quirk](https://github.com/theia-hq/quirk) | Our own QUIC over UDP, written from scratch: connections, reliable streams, and datagrams by hand. One of bifrost's backends, and it passes the same conformance suite as iroh. |
-| [nauthy](https://github.com/theia-hq/nauthy) | The gate. Capability tokens rooted at one key you hold. Mint a grant (bearer or bound): a bearer one can be narrowed and passed on; either can be revoked. Every grant carries an expiry and a revocation id, checked offline against the key the peer already dialed with. No server, no PKI, no allowlist to sync. |
-| [tightbeam](https://github.com/theia-hq/tightbeam) | The service runtime. A machine exposes local services under its key, each behind a gate; an admitted peer gets a raw bidirectional stream to one named service. Anything that speaks over a TCP port or Unix socket rides it unchanged. It ships no services of its own; you embed it and supply them. |
-| [swoosh](https://github.com/theia-hq/swoosh) | The assembly. One install, one binary: serve services, reach a key, measure the link, ssh in (a keyless shell, membership is the login), send files, forward ports, fetch through a peer, share access. It wires bifrost, nauthy, and tightbeam together. |
-
-**Ready-made nodes**
-
-| | |
-| --- | --- |
-| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell and link diagnostics behind the family gate, with HTTP fetch opt-in, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
-| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: summoned on demand, up for the minutes you set, gone on `swoosh stop` or at the timer. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
+[commands](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/reference/commands.md). Full walkthrough
+with captured output: [swoosh/docs/demo.md](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/demo.md).
 
 ## What the model makes possible
 
@@ -146,14 +145,21 @@ The same node runs on a laptop, a runner, or an on-demand machine. Tailscale and
 and permission in a control plane, rented or self-hosted. Here both live in the key, so no company can
 suspend them.
 
-## Try it
+## Compared to what you already use
 
-Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases), or run the install
-one-liner above. The install script gives the current release; the links above pin its docs.
-
-Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
-
-Full walkthrough with captured output: [swoosh/docs/demo.md](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/demo.md).
+- **vs Tailscale (rented) or headscale (self-hosted).** Both give you reach and identity, with a control
+  plane you rent or operate: a server, a database of who belongs, state to run, secure, and back up.
+  This gives you the same reach and identity without that control plane, and then past it: a grant here
+  is scoped to one service, expiring, revocable, delegable, and checked offline against the key that
+  dialed.
+- **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress, TLS, domains, browser access, and a free
+  tier. The edge sits in the vendor's trust path, and the service is theirs to cut. Here the service runs
+  on your machine behind your key; the endpoint is a key, not a rented hostname.
+- **vs iroh.** It reaches an ed25519 key over QUIC, then stops: no gate, no roster. This is that reach
+  plus the missing half. (bifrost-iroh is iroh underneath; this is the layer iroh chose not to be.)
+- **vs libp2p.** libp2p is a toolkit for a swarm: a DHT, pubsub, multiaddrs, transport negotiation, most
+  of it for discovering peers you do not know. You already know the peer, it is a key, so none of that is
+  needed: addressing is the key.
 
 ## Prior art
 
