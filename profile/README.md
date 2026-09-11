@@ -97,34 +97,30 @@ First reach, the whole model, every verb: [getting started](https://github.com/t
 
 ## The family
 
-Grouped by what each one does.
+Three responsibilities compose. Reach is [bifrost](https://github.com/theia-hq/bifrost), with
+[quirk](https://github.com/theia-hq/quirk) as our own QUIC backend: it opens a connection to an ed25519
+key over any transport. The gate is [nauthy](https://github.com/theia-hq/nauthy): it decides offline,
+against that same key, whether a peer may use one service. The service runtime is
+[tightbeam](https://github.com/theia-hq/tightbeam): it hands an admitted peer a raw stream to a named
+service. [swoosh](https://github.com/theia-hq/swoosh) is where they come together, one CLI and one
+install.
 
-**Reach** (address a peer by its ed25519 key over any transport)
-
-| | |
-| --- | --- |
-| [bifrost](https://github.com/theia-hq/bifrost) | Address a peer by key over any transport. Backends: iroh (internet, relay-backed), our own quirk, and an in-process one for tests. |
-| [quirk](https://github.com/theia-hq/quirk) | Our own QUIC over UDP, written from scratch. It passes the same conformance suite as iroh. |
-
-**The gate**
-
-| | |
-| --- | --- |
-| [nauthy](https://github.com/theia-hq/nauthy) | An identity you own admits your devices and your delegates through signed grants that are expiring, revocable, and can only be narrowed, never widened. No server, no PKI, no allowlist to sync. |
-
-**Services and the CLI**
+**The stack**
 
 | | |
 | --- | --- |
-| [swoosh](https://github.com/theia-hq/swoosh) | The one CLI: reach a key, measure the link, ssh in, fetch through a peer, push files, serve and share services. `swoosh ssh <key>` opens a shell with no ssh keys to manage: membership is the login, and the shell is never public. |
-| [tightbeam](https://github.com/theia-hq/tightbeam) | Reach a service by key, pass its gate, get a raw stream. The registry a node serves its services from. |
+| [bifrost](https://github.com/theia-hq/bifrost) | Reach. Address a peer by its ed25519 key and open a byte stream, wherever it is, across NATs, without knowing its address. Backends: iroh (QUIC with NAT hole-punching), our own quirk, and an in-process one for tests. It gives the connection and nothing more. |
+| [quirk](https://github.com/theia-hq/quirk) | Our own QUIC over UDP, written from scratch: connections, reliable streams, and datagrams by hand. One of bifrost's backends, and it passes the same conformance suite as iroh. |
+| [nauthy](https://github.com/theia-hq/nauthy) | The gate. Capability tokens rooted at one key you hold: mint a grant for one service, narrow it, pass it on, revoke it. Every grant carries an expiry and a revocation id, checked offline against the key the peer already dialed with. No server, no PKI, no allowlist to sync. |
+| [tightbeam](https://github.com/theia-hq/tightbeam) | The service runtime. A machine exposes local services under its key, each behind a gate; an admitted peer gets a raw bidirectional stream to one named service. Anything that speaks over a TCP port or Unix socket rides it unchanged. It ships no services of its own; you embed it and supply them. |
+| [swoosh](https://github.com/theia-hq/swoosh) | The assembly. One install, one binary: serve services, reach a key, measure the link, ssh in (a keyless shell, membership is the login), send files, forward ports, fetch through a peer, share access. It wires bifrost, nauthy, and tightbeam together. |
 
-**Stand up a node**
+**Ready-made nodes**
 
 | | |
 | --- | --- |
-| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: ssh in, fetch through it, run diagnostics against it, across GitHub's NAT. |
-| [qat](https://github.com/theia-hq/qat) | An example you can stand up yourself: an on-demand machine, dormant until you dial it, one running machine while you're in, gone when you leave. |
+| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell, HTTP fetch, and link diagnostics behind the family gate, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
+| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: dormant until you dial it, one running machine while you're in, gone when you leave. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
 
 ## Try it
 
