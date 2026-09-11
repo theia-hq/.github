@@ -28,32 +28,24 @@ Opening one to anyone takes a deliberate `--public`; a shell can never be public
 
 ## The family
 
-Start with a transport. [bifrost](https://github.com/theia-hq/bifrost) reaches a peer by its ed25519
-key, wherever it is, across NATs, without knowing its address. It carries two backends that matter
-here: iroh, a QUIC with NAT hole-punching and public relays, and
-[quirk](https://github.com/theia-hq/quirk), our own QUIC written from scratch.
+[bifrost](https://github.com/theia-hq/bifrost) is the transport. It addresses a peer by its ed25519
+key and opens a stream; the transport underneath is swappable. Today that is iroh, QUIC with NAT
+traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
+QUIC written from scratch. Most readers will never touch quirk; we wrote it to understand how this
+layer works. One limit today: both ends have to be online and findable for NAT traversal to connect
+them, and transports that do not need that are where this goes next.
 
-Now you can be reached. Who gets in? [nauthy](https://github.com/theia-hq/nauthy) is the gate. It
-decides offline, against the key that just dialed, whether a peer may use one service. A grant is
-scoped to one service, expiring, revocable, and delegable; a bearer one can be narrowed and passed on,
-a bound one cannot, and either can be revoked. There is no server to ask and no PKI.
+[nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your
+key, checked offline against the key that dialed. The trust is in the math, and the math is standard
+and not ours: ed25519 keys and biscuit tokens. The only operator is you.
 
-With reach and a gate, services stand up. [tightbeam](https://github.com/theia-hq/tightbeam) exposes
-local services under that key and hands an admitted peer a raw stream to one named service. It ships
-no services of its own; you embed it and supply them.
+[tightbeam](https://github.com/theia-hq/tightbeam) gives the node a set of named services; each sits
+behind its own gate, and an admitted peer gets a raw stream to the one it asked for and nothing else.
+It ships no services of its own, so you define the set.
 
-[swoosh](https://github.com/theia-hq/swoosh) is where it all arrives as one product: one CLI, one
-install. Serve a service, reach a key, measure the link, ssh in, send files, forward ports, fetch
-through a peer, share access. The transport, the gate, and the runtime come with it, already working
-together.
-
-| | |
-| --- | --- |
-| [bifrost](https://github.com/theia-hq/bifrost) | Transport: reach a peer by key. |
-| [quirk](https://github.com/theia-hq/quirk) | Our own QUIC, one bifrost backend. |
-| [nauthy](https://github.com/theia-hq/nauthy) | The gate: offline capability tokens. |
-| [tightbeam](https://github.com/theia-hq/tightbeam) | The service runtime: a stream to a named service. |
-| [swoosh](https://github.com/theia-hq/swoosh) | The CLI: the whole stack in one install. |
+[swoosh](https://github.com/theia-hq/swoosh) is the one CLI and one install where it all arrives
+working together: serve a service, reach a key, measure the link, ssh in, send files, forward ports,
+fetch through a peer, share access.
 
 **Ready-made nodes**
 
