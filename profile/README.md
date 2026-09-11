@@ -8,7 +8,12 @@ rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is a
 suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
 machine.
 
-This is for people who run their own boxes: a homelab, a family, a small team, CI runners, agents.
+Any two people should be able to run a service between them, a chat, a file drop, a shell, with no
+account, no middle, and no rented permission. You do not have to run a box for that to matter.
+
+Say a friend in Australia runs a chat service on their laptop. You reach it by its key, end to end, and
+no one in between can read it or shut it down. That is the kind of service the machinery makes possible,
+not a shipped chat app.
 
 ## It ends with you
 
