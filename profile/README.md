@@ -86,9 +86,9 @@ First reach, the whole model, every verb: [getting started](https://github.com/t
 ## Compared to what you already use
 
 - **vs Tailscale (rented) or headscale (self-hosted).** Reach works in both, but who you are and who is
-  allowed resolve against a control plane you operate: a server, a database of who belongs, state to run,
-  secure, and back up. Here admission is a signature your own key already vouches for, checked offline,
-  with no coordinator in the path.
+  allowed resolve against a control plane, rented or self-hosted: a server, a database of who belongs,
+  state to run, secure, and back up. Here admission is a signature your own key already vouches for,
+  checked offline, with no coordinator in the path.
 - **vs iroh.** It reaches an ed25519 key over QUIC, then stops: no gate, no roster. This is that reach
   plus the missing half. (bifrost-iroh is iroh underneath; this is the layer iroh chose not to be.)
 - **vs libp2p.** libp2p is a toolkit for a swarm: a DHT, pubsub, multiaddrs, transport negotiation, most
@@ -122,6 +122,21 @@ install.
 | [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell, HTTP fetch, and link diagnostics behind the family gate, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
 | [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: dormant until you dial it, one running machine while you're in, gone when you leave. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
 
+## What the model makes possible
+
+Two keys are enough to run a service between two people. You run it on a machine you own, and the other
+side reaches it by key with no account on either end. Anything that speaks over a TCP port or a Unix
+socket can sit behind the gate: a shell, a file drop, a database port, a service you wrote.
+
+Access is a grant rooted at a key, not a second identity to manage. It expires on its own and revokes
+without re-keying anyone. A grant names one service, so an admitted person reaches that one service and
+nothing else. Who belongs is a signature checked against the key the peer already dialed with. Who is
+cut off is a denial your own machine writes.
+
+The same node runs on a laptop, a runner, or an on-demand machine. The tools above put identity and
+permission in a control plane, rented or self-hosted. Here both live in the key, so no company can
+suspend them.
+
 ## Try it
 
 Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases), or run the install
@@ -144,7 +159,8 @@ The cryptography is not ours: identity is a plain ed25519 signature, admission a
 
 ---
 
-A grant is a bearer token: whoever holds an unexpired, un-revoked one gets that one service, so mint
-them scoped, short, and per person. A revoke is node-local and does not cut a session already open.
-quirk has no Noise handshake yet, so its identity is nominal, not proven crypto. Wire protocols, CLIs,
-and identity formats will change; not for production yet.
+A bare grant is a bearer token: whoever holds an unexpired, un-revoked one gets that one service, so
+mint those scoped and short. A bound one (--for) is theft-resistant: a stolen copy only works from the
+key it is bound to. A revoke is node-local and does not cut a session already open. quirk has no Noise
+handshake yet, so its identity is nominal, not proven crypto. Wire protocols, CLIs, and identity
+formats will change; not for production yet.
