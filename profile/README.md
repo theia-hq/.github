@@ -1,7 +1,8 @@
 # You are your key.
 
-Any two people can run services between their own machines. The way in is a signature from your key,
-checked offline. No account, no control plane, no one's permission.
+Any two people can run services between their own machines. The people you choose reach them by key.
+Admission is a signature from your key, checked offline. No account, no control plane, no one's
+permission.
 
 Today, reaching machines usually means compromising in one of three ways, each a point of
 vulnerability: run a control plane (Tailscale, headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or
