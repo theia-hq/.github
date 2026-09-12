@@ -1,15 +1,12 @@
 # You are your key.
 
-Run a service on a machine you own, and reach it from anywhere by the public key it prints. No
-account, no control plane, no one's permission.
+Any two people can run services between their own machines. The way in is a signature from your key,
+checked offline. No account, no control plane, no one's permission.
 
-Today, reaching machines means compromising in one of three ways: run a control plane (Tailscale,
-headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a
-vendor can suspend, and access is a bearer secret someone can lose. You are renting the front door to
-your own machine.
-
-The proposition is against the compromise itself: any two people can run a service between them, with
-no account, no control plane, and no rented permission.
+Today, reaching machines usually means compromising in one of three ways: run a control plane
+(Tailscale, headscale), rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is
+an account a vendor can suspend, and access is a bearer secret someone can lose. You are renting the
+front door to your own machine.
 
 ## It ends with you
 
@@ -22,18 +19,18 @@ Services sit behind a gate by default. Your own machines and the people you admi
 signature from your key. Everyone else is refused:
 
 > bf01hcq6balrlxwa via iroh: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
-<!-- captured from swoosh/docs/capabilities.md -->
+<!-- captured from swoosh/docs/capabilities.md on main -->
 
-Opening one to anyone takes a deliberate `--public`; a shell can never be public.
+Opening one to anyone takes a deliberate `--public`; the keyless shell service (`sshd:`) is refused.
 
 ## The family
 
 [bifrost](https://github.com/theia-hq/bifrost) is how a peer is reached. It addresses the peer by its
 ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh, QUIC with
 NAT traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
-QUIC written from scratch. Most readers will never touch quirk; we wrote it to understand how this layer
-works. One limit today: both ends have to be online and findable for NAT traversal to connect them, and
-transports that do not need that are where this goes next.
+QUIC-style transport written from scratch. Most readers will never touch quirk; we wrote it to understand
+how this layer works. One limit today: both ends have to be online and findable for NAT traversal to
+connect them. Transports that work without both ends online are where this goes next.
 
 [nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your
 key, checked offline against the key that dialed. The trust is in the math, and the math is standard
@@ -43,13 +40,12 @@ and not ours: ed25519 keys and biscuit tokens. The only operator is you.
 behind its own gate, and an admitted peer gets a raw stream to the one it asked for and nothing else.
 It ships no services of its own, so you define the set.
 
-[swoosh](https://github.com/theia-hq/swoosh) is the one CLI and one install where it all arrives
-working together: serve a service, reach a key, measure the link, ssh in, send files, forward ports,
-fetch through a peer, share access.
+[swoosh](https://github.com/theia-hq/swoosh) is the one CLI and one install: serve a service, reach a
+key, measure the link, ssh in, send files, forward ports, fetch through a peer, share access.
 
 Every layer here is a crate you can build on: reach, the gate, and the service runtime stand alone, and
-the service engines are stack-general. [swoosh](https://github.com/theia-hq/swoosh) is the one we built
-to show them working together.
+the service engines are not tied to swoosh. [swoosh](https://github.com/theia-hq/swoosh) is the one we
+built to show them working together.
 
 **Ready-made nodes**
 
@@ -60,15 +56,15 @@ to show them working together.
 
 ## Get it
 
-Install (pre-1.0, not for production yet):
+Install (prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0, not for production yet):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
 ```
 
 Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases) instead if you
-prefer. The install script gives the current release; the doc links below pin its docs. Use
-[qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
+prefer. The install script gives the current release; the doc links below point at that release's docs.
+Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
 
 ## Serve, reach, grant, revoke
 
@@ -104,8 +100,8 @@ $ swoosh ssh bf013m24wpob5axozjmmzv2w3nikjto6nllmwpfiuij7qemsrd3m4hgq -- echo he
 hello
 ```
 
-`signet` is the local name you gave a key; `fleet` is the set of devices that key vouches for. Grant one
-person one service for 14 days, then revoke it:
+`signet` is the local name you gave a key; `fleet` is the set of devices that key vouches for. A
+`sheer:` link is the grant you hand out. Grant one person one service for 14 days, then revoke it:
 
 ```console
 $ swoosh contact signet contractor bf014hag2b3nqbyt…
@@ -117,7 +113,7 @@ issued a fleet-bound grant for `ssh` to fleet signet bf014hag2b3nqbyt…
   revoke: swoosh grant revoke bf014hag2b3nqbyt…
 sheer:bf013m24wpob5axo…
 
-$ swoosh grant revoke bf014hag2b3nqbyt
+$ swoosh grant revoke bf014hag2b3nqbyt…
 revoked 1 grant(s) to bf014hag2b3nqbyt… (…/revoked)
 ```
 
@@ -137,16 +133,14 @@ without re-keying anyone. A grant names one service, so an admitted person reach
 nothing else. Who belongs is a signature checked against the key the peer already dialed with. Who is
 cut off is a denial your own machine writes.
 
-The same node runs on a laptop, a runner, or an on-demand machine. Tailscale and headscale put identity
-and permission in a control plane, rented or self-hosted. Here both live in the key, so no company can
-suspend them.
+The same node runs on a laptop, a runner, or an on-demand machine.
 
 ## Compared to what you already use
 
 - **vs Tailscale (rented) or headscale (self-hosted).** Both give you reach and identity, with a control
   plane you rent or operate: a server, a database of who belongs, state to run, secure, and back up.
-  This gives you the same reach and identity without that control plane, and then past it: a grant here
-  is scoped to one service, expiring, revocable, delegable, and checked offline against the key that
+  This gives you that reach and identity without the control plane, and then past it: a grant here is
+  scoped to one service, expiring, revocable, delegable, and checked offline against the key that
   dialed.
 - **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress, TLS, domains, browser access, and a free
   tier. The edge sits in the vendor's trust path, and the service is theirs to cut. Here the service runs
@@ -157,22 +151,26 @@ suspend them.
   of it for discovering peers you do not know. You already know the peer, it is a key, so none of that is
   needed: addressing is the key.
 
-## Prior art
+## What Tailscale shipped next
 
-Tailscale shipped [`tailcat`](https://tailscale.com/blog/tailcat), their data plane with the control
-plane stripped out: it reaches a peer with no coordinator, but membership is a flat static nodekey list,
-with no names, expiry, revocation, or scoped services. They hand you no revocable membership.
-
-The cryptography is not ours: identity is a plain ed25519 key; the credential is a signature. Theia roots
-the gate and the roster in a key you own, not a separate control plane.
+Tailscale open-sourced [`tailcat`](https://tailscale.com/blog/tailcat) on 2026-08-31, after swoosh
+v0.1.0 shipped on 2026-08-27. It is their data plane with the control plane stripped out. It concedes
+reach with no coordinator. It does not concede the gate or the roster. Admission is possession of the
+address, with an optional flat static nodekey allow-list. There is no expiry, no delegation, and no
+per-service capability. They hand you no revocable membership.
 
 ---
 
-A bare grant is a bearer token: whoever holds an unexpired, un-revoked one gets that one service, so
-issue those scoped and short. A bound one (`--for`) is theft-resistant: a stolen copy only works from a
-device it is bound to, or a device the bound signet vouches for. A revoke is node-local and does not cut
-a session already open. Reaching across the internet falls back to iroh's public relays when a direct
-path fails; they forward encrypted bytes and cannot read them or admit anyone, but they can see who talks
-to whom and can drop traffic, and you can self-host them. quirk has no Noise handshake yet, so its
-identity is nominal, not proven crypto. The crates are consumed as git dependencies today; nothing is on
-crates.io yet. Wire protocols, CLIs, and identity formats will change; not for production yet.
+**A bare grant is a bearer token.** Whoever holds an unexpired, un-revoked one gets that one service,
+so keep it short-lived. A bound grant (`--for`) is theft-resistant: a stolen copy only works from a
+device it is bound to, or a device the bound signet vouches for. A revoke is node-local: the next dial
+is refused, and a session already open is not cut.
+
+**The relay fallback is iroh's.** When a direct path fails, iroh's public relays forward encrypted
+bytes and cannot read them or admit anyone. They can see who talks to whom and can drop traffic.
+Pointing swoosh at your own relay is not wired up yet.
+
+**Early software.** quirk has no Noise handshake yet, so its identity is nominal, not proven crypto,
+and it is direct-only (LAN or an address you pass with `--peer`). The crates are consumed as git
+dependencies today; none of them is published to crates.io yet. Wire protocols, CLIs, and identity
+formats will change; not for production yet.
