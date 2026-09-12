@@ -30,8 +30,9 @@ Opening one to anyone takes a deliberate `--public` (raw byte sources take the s
 ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh, QUIC with
 NAT traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
 QUIC-style transport written from scratch. Most people will never touch quirk; we wrote it to understand
-how this layer works. One limit today: both ends have to be online and findable for NAT traversal to
-connect them. Transports that work without both ends online are where this goes next.
+how this layer works. quirk has no Noise handshake yet, so its identity is not proven crypto. One limit
+today: both ends have to be online and findable for NAT traversal to connect them. Transports that work
+without both ends online are where this goes next.
 
 [nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your
 key, checked offline against the key that dialed. The trust is in the math, and the math is standard.
@@ -47,7 +48,8 @@ fetch through a peer, share access.
 
 Every layer here is a crate you can build on: reach, the gate, and the service runtime stand alone, and
 the service engines are not tied to swoosh. They live in [services](https://github.com/theia-hq/services):
-fetch, measure, sshh, and transfer.
+fetch, measure, sshh, and transfer, consumed as git dependencies today; pin a rev if you want a fixed
+point.
 
 **Ready-made nodes**
 
@@ -139,8 +141,9 @@ over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoo
 ## What the model makes possible
 
 Two keys are enough to run a service between two people. You run it on a machine you own, and the other
-side reaches it by key with no account on either end. Anything that speaks over a TCP port or a Unix
-socket can sit behind the gate: a shell, a file drop, a database port, a service you wrote.
+side reaches it by key with no account on either end. A forward puts anything that already speaks over
+a TCP port or a Unix socket behind the gate: a database port, an app on a socket. A service you write
+runs in the node as a handler, speaking its own protocol over the stream.
 
 Access is a grant rooted at a key, not a second identity to manage. It expires on its own and revokes
 without re-keying anyone. A grant names one service, so an admitted person reaches that one service and
@@ -184,9 +187,5 @@ is refused, and a session already open is not cut.
 
 **The relay fallback is iroh's.** When a direct path fails, iroh's public relays forward encrypted
 bytes and cannot read them or admit anyone. They can see who talks to whom and can drop traffic.
-Pointing swoosh at your own relay is not wired up yet.
 
-**Early software.** quirk has no Noise handshake yet, so its identity is nominal, not proven crypto,
-and it is direct-only (LAN or an address you pass with `--peer`). The crates are consumed as git
-dependencies today; pin a rev if you want a fixed point; none of them is published to crates.io yet.
-Wire protocols, CLIs, and identity formats will change; not for production yet.
+**Early software.** Wire protocols, CLIs, and identity formats will change; not for production yet.
