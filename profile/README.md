@@ -156,8 +156,8 @@ The same node runs on a laptop, a runner, or an on-demand machine.
 [`tailcat`](https://tailscale.com/blog/tailcat) is Tailscale's data plane with the control plane stripped
 out, which is the direction: reach stands alone, and a peer is reachable with no coordinator. Where it
 stops is the gate and the roster. Admission there is possession of the address, with an optional flat
-static nodekey allow-list: no expiry, no delegation, no per-service capability, so who belongs and who
-may reach what stays in their control plane. Here the gate and the roster live in the key.
+static nodekey allow-list configured locally: no expiry, no delegation, no per-service capability, so who
+belongs and who may reach what stays a control plane's job. Here the gate and the roster live in the key.
 
 ---
 
