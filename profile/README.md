@@ -174,5 +174,5 @@ device it is bound to, or a device the bound signet vouches for. A revoke is nod
 a session already open. Reaching across the internet falls back to iroh's public relays when a direct
 path fails; they forward encrypted bytes and cannot read them or admit anyone, but they can see who talks
 to whom and can drop traffic, and you can self-host them. quirk has no Noise handshake yet, so its
-identity is nominal, not proven crypto. Wire protocols, CLIs, and identity formats will change; not for
-production yet.
+identity is nominal, not proven crypto. The crates are consumed as git dependencies today; nothing is on
+crates.io yet. Wire protocols, CLIs, and identity formats will change; not for production yet.
