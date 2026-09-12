@@ -47,6 +47,10 @@ It ships no services of its own, so you define the set.
 working together: serve a service, reach a key, measure the link, ssh in, send files, forward ports,
 fetch through a peer, share access.
 
+Every layer here is a crate you can build on: reach, the gate, and the service runtime stand alone, and
+the service engines are stack-general. [swoosh](https://github.com/theia-hq/swoosh) is the one we built
+to show them working together.
+
 **Ready-made nodes**
 
 | | |
