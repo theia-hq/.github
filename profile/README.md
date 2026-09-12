@@ -151,13 +151,13 @@ The same node runs on a laptop, a runner, or an on-demand machine.
   of it for discovering peers you do not know. You already know the peer, it is a key, so none of that is
   needed: addressing is the key.
 
-## What Tailscale shipped next
+## The same direction
 
-Tailscale open-sourced [`tailcat`](https://tailscale.com/blog/tailcat) on 2026-08-31, after swoosh
-v0.1.0 shipped on 2026-08-27. It is their data plane with the control plane stripped out. It gives you
-reach with no coordinator. It does not give you the gate or the roster. Admission is possession of the
-address, with an optional flat static nodekey allow-list. There is no expiry, no delegation, and no
-per-service capability. They hand you no revocable membership.
+[`tailcat`](https://tailscale.com/blog/tailcat) is Tailscale's data plane with the control plane stripped
+out, which is the direction: reach stands alone, and a peer is reachable with no coordinator. Where it
+stops is the gate and the roster. Admission there is possession of the address, with an optional flat
+static nodekey allow-list: no expiry, no delegation, no per-service capability, so who belongs and who
+may reach what stays in their control plane. Here the gate and the roster live in the key.
 
 ---
 
