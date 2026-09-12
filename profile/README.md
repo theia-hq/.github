@@ -155,10 +155,10 @@ A control plane is not required to run services or to decide who reaches them.
 
 - **vs Tailscale (rented) or headscale (self-hosted).** Both give you reach and identity, with a control
   plane you rent or operate: a server, a database of who belongs, state to secure and back up. Here there
-  is no control plane; the gate and the roster are the key. The grant goes further: scoped to one service,
-  expiring, revocable, checked offline against the key that dialed. A bearer grant can be handed on; a
+  is no control plane; the gate and the roster live in the key. The grant goes further: scoped to one service,
+  expiring, revocable, checked offline against the key that dialed. A bare grant can be handed on; a
   bound one cannot.
-- **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress: TLS, domains, browser access, and a free
+- **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress: TLS, domains, and browser access, plus a free
   tier. The edge sits in the vendor's trust path. The service is theirs to cut. Here the service runs on
   your machine behind your key. The endpoint is a key, not a rented hostname.
 - **vs iroh.** It reaches an ed25519 key over QUIC, then stops: no gate, no roster. This is that reach
