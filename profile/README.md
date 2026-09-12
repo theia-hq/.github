@@ -51,12 +51,12 @@ built to show them working together.
 
 | | |
 | --- | --- |
-| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell and link diagnostics behind the family gate, with HTTP fetch opt-in, across GitHub's NAT, no port forward, nothing session-identifying in the logs. |
+| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key: serve a keyless shell and link diagnostics behind the family gate, with HTTP fetch opt-in, across GitHub's NAT, no port forward, no join ticket in the logs. |
 | [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: summoned on demand, up for the minutes you set, gone on `swoosh stop` or at the timer. Across GitHub's NAT, by membership, no ssh keys and no standing VM. |
 
 ## Get it
 
-Install (prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0, not for production yet):
+Install (prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
@@ -140,8 +140,8 @@ The same node runs on a laptop, a runner, or an on-demand machine.
 - **vs Tailscale (rented) or headscale (self-hosted).** Both give you reach and identity, with a control
   plane you rent or operate: a server, a database of who belongs, state to run, secure, and back up.
   This gives you that reach and identity without the control plane, and then past it: a grant here is
-  scoped to one service, expiring, revocable, delegable, and checked offline against the key that
-  dialed.
+  scoped to one service, expiring, revocable, and checked offline against the key that dialed; a bearer
+  grant can be handed on, a bound one cannot.
 - **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress, TLS, domains, browser access, and a free
   tier. The edge sits in the vendor's trust path, and the service is theirs to cut. Here the service runs
   on your machine behind your key; the endpoint is a key, not a rented hostname.
@@ -154,8 +154,8 @@ The same node runs on a laptop, a runner, or an on-demand machine.
 ## What Tailscale shipped next
 
 Tailscale open-sourced [`tailcat`](https://tailscale.com/blog/tailcat) on 2026-08-31, after swoosh
-v0.1.0 shipped on 2026-08-27. It is their data plane with the control plane stripped out. It concedes
-reach with no coordinator. It does not concede the gate or the roster. Admission is possession of the
+v0.1.0 shipped on 2026-08-27. It is their data plane with the control plane stripped out. It gives you
+reach with no coordinator. It does not give you the gate or the roster. Admission is possession of the
 address, with an optional flat static nodekey allow-list. There is no expiry, no delegation, and no
 per-service capability. They hand you no revocable membership.
 
@@ -172,5 +172,5 @@ Pointing swoosh at your own relay is not wired up yet.
 
 **Early software.** quirk has no Noise handshake yet, so its identity is nominal, not proven crypto,
 and it is direct-only (LAN or an address you pass with `--peer`). The crates are consumed as git
-dependencies today; none of them is published to crates.io yet. Wire protocols, CLIs, and identity
-formats will change; not for production yet.
+dependencies today; pin a rev if you want a fixed point; none of them is published to crates.io yet.
+Wire protocols, CLIs, and identity formats will change; not for production yet.
