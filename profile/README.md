@@ -141,9 +141,9 @@ over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoo
 ## What the model makes possible
 
 Two keys are enough to run a service between two people. You run it on a machine you own, and the other
-side reaches it by key with no account on either end. A forward puts anything that already speaks over
-a TCP port or a Unix socket behind the gate: a database port, an app on a socket. A service you write
-runs in the node as a handler, speaking its own protocol over the stream.
+side reaches it by key with no account on either end. Everything served is a service on a byte stream: a
+forwarded port, a shell, a file drop, a protocol you write. The gate decides who may open the stream;
+what the service does with it is the service's business.
 
 Access is a grant rooted at a key, not a second identity to manage. It expires on its own and revokes
 without re-keying anyone. A grant names one service, so an admitted person reaches that one service and
