@@ -54,10 +54,10 @@ point.
 
 **Ready-made nodes**
 
-| | |
-| --- | --- |
-| [swoosh-action](https://github.com/theia-hq/swoosh-action) | Turn a GitHub Actions runner into a node you reach by key. |
-| [qat](https://github.com/theia-hq/qat) | A template for an on-demand machine you `swoosh ssh` into: up for the minutes you set, gone at the timer. |
+- [swoosh-action](https://github.com/theia-hq/swoosh-action) turns a GitHub Actions runner into a node
+  you reach by key.
+- [qat](https://github.com/theia-hq/qat) is a template for an on-demand machine you `swoosh ssh` into:
+  up when you dispatch it, gone at the timer.
 
 ## Get it
 
