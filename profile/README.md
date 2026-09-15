@@ -76,7 +76,7 @@ Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it aga
 Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
 cut at any time. The commands below ran against the released binary:
 
-<!-- Captured 2026-09-12 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; the serve banner is trimmed to the readiness key and the operator-served rows; the reach section, the control row, and the stop line are omitted; the ping path line is omitted. The present is captured from a device that alice's signet vouches for. -->
+<!-- Captured 2026-09-12 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`; alice's signet shown as the docs' example key; the serve banner is trimmed to the readiness key and the operator-served rows; the reach section, the control row, and the stop line are omitted; the ping path line is omitted. -->
 
 Serve on the machine you want to reach:
 
@@ -92,9 +92,9 @@ serving
     ssh -> sshd   a shell on this machine
 ```
 
-Enroll a second machine (`swoosh mint` on the first, `swoosh adopt` on the second; see [Getting
-started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md)), then reach the first
-by the key it printed:
+Enroll a second machine (`swoosh invite add <label>` on the first, `swoosh adopt` on the second; see
+[Getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md)), then reach
+the first by the key it printed:
 
 ```console
 $ swoosh ping bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q
@@ -110,28 +110,23 @@ devices that key vouches for. A `sheer:` link is the grant you hand out. Grant a
 days, then revoke it:
 
 ```console
-$ swoosh contact signet alice bf01ppi2zpeda646…
-recorded alice's signet -> bf01ppi2zpeda646
+$ swoosh contact signet alice bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
+recorded alice's signet -> bf01o6vqymgz727g
 
 $ swoosh grant issue ssh --for fleet:alice --expires 14d
-issued a fleet-bound grant for `ssh` to fleet signet bf01ppi2zpeda646…
+issued a fleet-bound grant for `ssh` to fleet signet bf01o6vqymgz727g…
   every device that signet vouches for can use it (theft-resistant); expires in 14d
-  revoke: swoosh grant revoke bf01ppi2zpeda646…
-sheer:bf016hqovu7t2eigo…
+  revoke: swoosh grant revoke bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
+sheer:bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q.…
 ```
 
-On a device her signet vouches for, alice presents the link:
-
-```console
-$ swoosh ssh bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q --present sheer:bf016hqovu7t2eigo… -- echo hello
-hello
-```
+On a device her signet vouches for, alice presents the link with `--present` when she reaches the node.
 
 Then revoke it:
 
 ```console
-$ swoosh grant revoke bf01ppi2zpeda646…
-revoked 1 grant(s) to bf01ppi2zpeda646… (…/revoked)
+$ swoosh grant revoke bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
+revoked 1 grant(s) to bf01o6vqymgz727g… (…/revoked)
 ```
 
 First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md),
