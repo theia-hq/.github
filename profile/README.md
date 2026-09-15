@@ -76,7 +76,7 @@ Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it aga
 Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
 cut at any time. The commands below ran against the released binary:
 
-<!-- Captured 2026-09-12 from swoosh v0.8.0 (aarch64-macos release); long keys truncated with `…`. -->
+<!-- Captured 2026-09-15 from swoosh v0.9.0 (aarch64-macos release); long keys truncated with `…`. -->
 
 Serve on the machine you want to reach:
 
@@ -93,7 +93,7 @@ serving
 ```
 
 Enroll a second machine (`swoosh invite add <label>` on the first, `swoosh adopt` on the second; see
-[Getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md)), then reach
+[Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md)), then reach
 the first by the key it printed:
 
 ```console
@@ -130,10 +130,10 @@ $ swoosh grant revoke bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
 revoked 1 grant(s) to bf01o6vqymgz727g… (…/revoked)
 ```
 
-First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/getting-started.md),
-[Keys](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/keys.md),
-[Commands](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/reference/commands.md). The same commands
-over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoosh/blob/v0.8.0/docs/demo.md).
+First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md),
+[Keys](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/keys.md),
+[Commands](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/reference/commands.md). The same commands
+over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/demo.md).
 
 ## What the model makes possible
 
