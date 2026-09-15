@@ -19,8 +19,8 @@ no dashboard to open, so nothing to suspend, migrate, or delete.
 Services sit behind a gate by default. The node's family gets in with a signature from your key: your
 devices and anyone you grant. Everyone else is refused:
 
-> bf01hcq6balrlxwa… via iroh: reached, but refused (not admitted: not a member of this node's family, and no capability for this service)
-<!-- captured from swoosh/docs/capabilities.md on main; the same refusal is at v0.8.0 docs/demo.md:163 over quirk -->
+> bf01hcq6balrlxwa… via iroh: reached, but refused (not admitted: no member badge or capability for this service was accepted)
+<!-- observed on the shipped v0.9.0 binary; the same wording is in swoosh/docs/demo.md (stranger refused over quirk+noise) -->
 
 Opening one to anyone takes a deliberate `--public`; a file, a fifo, or stdin needs the separate
 `--public-unsafe`. The keyless shell (`sshd:`) is refused.
