@@ -1,80 +1,19 @@
 # You are your key.
 
-Any two people can run services between their own machines. The people you choose reach them by key.
-Admission is a signature from your key, checked offline. No account, no control plane, no one's
-permission.
-
-Today, reaching machines usually means one of three things: run a control plane (Tailscale, headscale),
-rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a vendor can
-suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
-machine.
-
-## It ends with you
-
-Your identity is a key you hold, not a row in someone's database. There is no account to register and
-no dashboard to open, so nothing to suspend, migrate, or delete.
-
-> **No company can deplatform what has no account.**
-
-Services sit behind a gate by default. The node's family gets in with a signature from your key: your
-devices and anyone you grant. Everyone else is refused:
-
-> bf01hcq6balrlxwa… via iroh: reached, but refused (not admitted: no member badge or capability for this service was accepted)
-<!-- observed on the shipped v0.9.0 binary; the same wording is in swoosh/docs/demo.md (stranger refused over quirk+noise) -->
-
-Opening one to anyone takes a deliberate `--public`; a file, a fifo, or stdin needs the separate
-`--public-unsafe`. The keyless shell (`sshd:`) is refused.
-
-## The pieces
-
-[bifrost](https://github.com/theia-hq/bifrost) is how a peer is reached. It addresses the peer by its
-ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh, QUIC with
-NAT traversal and a fallback to public relays, and [quirk](https://github.com/theia-hq/quirk), our own
-QUIC-style transport written from scratch. Most people will never touch quirk; we wrote it to understand
-how this layer works. quirk is direct-only (no NAT traversal, no off-LAN discovery), with no Noise
-handshake yet, so its identity is not proven crypto. One limit today: both ends have to be online and
-findable for NAT traversal to connect them. Transports that work without both ends online are where this
-goes next.
-
-[nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your
-key, checked offline against the key that dialed. The trust is in the math, and the math is standard.
-No, we didn't roll our own crypto: ed25519 keys and biscuit tokens. The only operator is you.
-
-[tightbeam](https://github.com/theia-hq/tightbeam) gives the node a set of named services; each sits
-behind its own gate, and an admitted peer gets a raw stream to the one it asked for and nothing else.
-It ships only its own built-ins (`echo:`, forwards, raw streams); the set you serve is yours.
-
-[swoosh](https://github.com/theia-hq/swoosh) is where reach, the gate, and the services become one tool:
-one CLI, one install. Serve a service, reach a key, measure the link, ssh in, send files, forward ports,
-fetch through a peer, share access.
-
-Every layer is a library you can build on: reach, the gate, and the service runtime stand alone, and
-the engines are not tied to swoosh. They live in [services](https://github.com/theia-hq/services):
-fetch, measure, sshh, transfer.
-
-**Ready-made nodes**
-
-- [swoosh-action](https://github.com/theia-hq/swoosh-action) turns a GitHub Actions runner into a node
-  you reach by key.
-- [qat](https://github.com/theia-hq/qat) is a template for an on-demand machine you `swoosh ssh` into:
-  up when you dispatch it, gone at the timer.
-
-## Get it
-
-Install (prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0):
+Reach a machine by its public key. Grant one person one service, and cut them off without touching
+anyone else. No account, no server you rent, no one's permission.
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/install.sh | sh
 ```
 
-Grab a binary from the [latest release](https://github.com/theia-hq/swoosh/releases) instead if you
-prefer. The install script gives the current release; the doc links below point at that release's docs.
-Use [qat](https://github.com/theia-hq/qat) when you need a machine to try it against.
+Prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0. A binary from the
+[latest release](https://github.com/theia-hq/swoosh/releases) works too. The doc links below point at that
+release's docs. [qat](https://github.com/theia-hq/qat) gives you a machine to try it against.
 
 ## Serve, reach, grant, revoke
 
-Reach a machine by key across NAT with no account. Hand out a grant that expires on its own and can be
-cut at any time. The commands below ran against the released binary:
+The commands below ran against the released binary:
 
 <!-- Captured 2026-09-15 from swoosh v0.9.0 (aarch64-macos release); long keys truncated with `…`. -->
 
@@ -94,7 +33,7 @@ serving
 
 Enroll a second machine (`swoosh invite add <label>` on the first, `swoosh adopt` on the second; see
 [Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md)), then reach
-the first by the key it printed:
+the first by the key it printed, across NAT:
 
 ```console
 $ swoosh ping bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q
@@ -105,9 +44,14 @@ $ swoosh ssh bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q -- echo he
 hello
 ```
 
-`signet` is a person's identity key, recorded under a local name like `alice`; `fleet` is the set of
-devices that key vouches for. A `sheer:` link is the grant you hand out. Grant alice one service for 14
-days, then revoke it:
+Anyone else who reaches the node is refused:
+
+> bf01hcq6balrlxwa… via iroh: reached, but refused (not admitted: no member badge or capability for this service was accepted)
+<!-- observed on the shipped v0.9.0 binary; the same wording is in swoosh/docs/demo.md (stranger refused over quirk+noise) -->
+
+Now let alice in. `signet` is a person's identity key, recorded under a local name; `fleet` is the set
+of devices that key vouches for. A `sheer:` link is the grant you hand out. Grant her one service for 14
+days:
 
 ```console
 $ swoosh contact signet alice bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
@@ -121,35 +65,78 @@ sheer:bf016hqovu7t2eigosog42dttwpr6ypzqdsnr7t5t5ih3xytmi26w56q.…
 ```
 
 On a device her signet vouches for, alice presents the link when she reaches the node:
-`swoosh ssh <node> --present sheer:… -- echo hello`.
-
-Then revoke it:
+`swoosh ssh <node> --present sheer:… -- echo hello`. When you are done with her:
 
 ```console
 $ swoosh grant revoke bf01o6vqymgz727gazsni37uoify447gropuhsuduzd6lbn4q5iscxfq
 revoked 1 grant(s) to bf01o6vqymgz727g… (…/revoked)
 ```
 
+The grant expired on its own if you forgot. Nobody else's access moved.
+
 First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md),
 [Keys](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/keys.md),
 [Commands](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/reference/commands.md). The same commands
 over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/demo.md).
 
-## What the model makes possible
+## It ends with you
 
-Two keys are enough to run a service between two people. You run it on a machine you own, and the other
-side reaches it by key with no account on either end. Everything served is a service on a byte stream: a
-forwarded port, a shell, a file drop, a protocol you write. The gate decides who may open the stream;
-what the service does with it is the service's business.
+Today, reaching machines usually means one of three things: run a control plane (Tailscale, headscale),
+rent a tunnel (ngrok, Cloudflare Tunnel), or open a port and hope. Identity is an account a vendor can
+suspend, and access is a bearer secret someone can lose. You are renting the front door to your own
+machine.
 
-Access is a grant rooted at a key, not a second identity to manage. It expires on its own and revokes
-without re-keying anyone. A grant names one service, so an admitted person reaches that one service and
-nothing else. Who belongs is a signature checked against the key the peer already dialed with. Who is
-cut off is a denial your own machine writes.
+Here, your identity is a key you hold, not a row in someone's database. There is no account to register
+and no dashboard to open, so nothing to suspend, migrate, or delete.
 
-The same node runs on a laptop, a runner, or an on-demand machine.
+> **No company can deplatform what has no account.**
 
-A control plane is not required to run services or to decide who reaches them.
+Services sit behind a gate by default. The node's family gets in with a signature from your key: your
+devices and anyone you grant. Everyone else is refused, with the one line above. Opening a service to
+anyone takes a deliberate `--public`; a file, a fifo, or stdin needs the separate `--public-unsafe`. The
+keyless shell (`sshd:`) never opens.
+
+Access is a grant rooted at your key, not a second identity to manage. It names one service, expires on
+its own, and revokes without re-keying anyone. Who belongs is a signature checked against the key the
+peer already dialed with. Who is cut off is a line your own machine writes.
+
+## The pieces
+
+Everything served is a service on a byte stream: a shell, a forwarded port, a file drop, a protocol you
+write. A node is a router. Each name binds one service behind the one gate, and an admitted peer gets a
+stream to the service it asked for and nothing else. The gate decides who may open the stream; what the
+service does with it is the service's business.
+
+[bifrost](https://github.com/theia-hq/bifrost) is how a peer is reached. It addresses the peer by its
+ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh: QUIC with
+NAT traversal and a fallback to public relays. Beside it sits [quirk](https://github.com/theia-hq/quirk), a
+transport we wrote from scratch over UDP to learn the layer. It is QUIC-shaped, not QUIC, and direct-only:
+no NAT traversal, no discovery beyond the address you hand it. With its Noise handshake it proves the
+peer's key and gates work over it; most people will never touch it. One limit today: both ends have to
+be online and findable for NAT traversal to connect them.
+
+[nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your key,
+checked offline against the key that dialed. The trust is in the math, and the math is standard: ed25519
+keys and biscuit tokens, neither of them ours. The only operator is you.
+
+[tightbeam](https://github.com/theia-hq/tightbeam) is the router: named services, one gate in front of all
+of them, and a wire that refuses before a byte flows. It ships its own built-ins (`echo:`, forwards, raw
+streams); the set you serve is yours.
+
+[services](https://github.com/theia-hq/services) are the engines a node serves: `fetch`, `measure`,
+`sshh`, `transfer`. Each is a library that does one job on an admitted stream and depends on none of the
+tools.
+
+[swoosh](https://github.com/theia-hq/swoosh) is where reach, the gate, and the engines become one tool:
+one CLI, one install. Serve, reach a key, measure the link, ssh in, send files, forward ports, fetch
+through a peer, share access.
+
+Every layer is a library you can build on. Two ready-made nodes:
+
+- [swoosh-action](https://github.com/theia-hq/swoosh-action) turns a GitHub Actions runner into a node
+  you reach by key.
+- [qat](https://github.com/theia-hq/qat) is a template for an on-demand machine you `swoosh ssh` into:
+  up when you dispatch it, gone at the timer.
 
 ## Compared to what you already use
 
@@ -178,7 +165,9 @@ so keep it short-lived. A bound grant (`--for`) is theft-resistant: a stolen cop
 device it is bound to, or a device the bound signet vouches for. A revoke is node-local: the next dial
 is refused, and a session already open is not cut.
 
-**The relay fallback is iroh's.** When a direct path fails, iroh's public relays forward encrypted
-bytes and cannot read them or admit anyone. They can see who talks to whom and can drop traffic.
+**Finding a peer and the relay fallback are iroh's.** A serving node publishes where it can be reached to
+n0's public discovery service, and when a direct path fails, n0's public relays forward encrypted bytes.
+Neither can read traffic or admit anyone. Both can see who talks to whom, and both can go away. Pointing
+swoosh at a relay and a resolver you run is not wired today.
 
 **Early software.** Wire protocols, CLIs, and identity formats will change; not for production yet.
