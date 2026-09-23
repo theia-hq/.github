@@ -8,12 +8,12 @@ curl -fsSL https://raw.githubusercontent.com/theia-hq/swoosh/main/scripts/instal
 ```
 
 Prebuilt for x86_64 and aarch64 Linux and Apple Silicon macOS; pre-1.0. A binary from the
-[latest release](https://github.com/theia-hq/swoosh/releases) works too. The doc links below point at that
-release's docs. [qat](https://github.com/theia-hq/qat) gives you a machine to try it against.
+[releases page](https://github.com/theia-hq/swoosh/releases) works too. The doc links below point at
+v0.12.0. [qat](https://github.com/theia-hq/qat) gives you a machine to try it against.
 
 ## Serve, reach, grant, revoke
 
-The commands below ran against the released binary:
+The commands below ran against the v0.9.0 binary; later releases print more than is shown here:
 
 <!-- Captured 2026-09-15 from swoosh v0.9.0 (aarch64-macos release); long keys truncated with `…`. -->
 
@@ -32,7 +32,7 @@ serving
 ```
 
 Enroll a second machine (`swoosh invite add <label>` on the first, `swoosh adopt` on the second; see
-[Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md)), then reach
+[Getting started](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/getting-started.md)), then reach
 the first by the key it printed, across NAT:
 
 ```console
@@ -74,10 +74,10 @@ revoked 1 grant(s) to bf01o6vqymgz727g… (…/revoked)
 
 The grant expired on its own if you forgot. Nobody else's access moved.
 
-First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/getting-started.md),
-[Keys](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/keys.md),
-[Commands](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/reference/commands.md). The same commands
-over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoosh/blob/v0.9.0/docs/demo.md).
+First reach, the whole model, every verb: [Getting started](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/getting-started.md),
+[Keys](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/keys.md),
+[Commands](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/reference/commands.md). The same commands
+over two transports, a stranger refused: [Demo](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/demo.md).
 
 ## It ends with you
 
@@ -108,12 +108,14 @@ stream to the service it asked for and nothing else. The gate decides who may op
 service does with it is the service's business.
 
 [bifrost](https://github.com/theia-hq/bifrost) is how a peer is reached. It addresses the peer by its
-ed25519 key and opens a stream, and the transport underneath is swappable. Today that is iroh: QUIC with
-NAT traversal and a fallback to public relays. Beside it sits [quirk](https://github.com/theia-hq/quirk), a
-transport we wrote from scratch over UDP to learn the layer. It is QUIC-shaped, not QUIC, and direct-only:
-no NAT traversal, no discovery beyond the address you hand it. With its Noise handshake it proves the
-peer's key and gates work over it; most people will never touch it. One limit today: both ends have to
-be online and findable for NAT traversal to connect them.
+ed25519 key and opens a stream; the transport underneath is an interface, and the key you dial does not
+change when you change it. The default is iroh: QUIC with NAT traversal and a fallback to public relays.
+Beside it sits [quirk](https://github.com/theia-hq/quirk), a transport we wrote from scratch over UDP to
+learn the layer. It is QUIC-shaped, not QUIC, and direct-only: no NAT traversal, no discovery beyond the
+address you hand it, and it carries plaintext and takes the peer's key on its word. `--transport
+quirk+noise` wraps it in a Noise handshake that proves the key, and gated services work over that. Most
+people never touch it. One limit today: both ends have to be online and findable for NAT traversal
+to connect them.
 
 [nauthy](https://github.com/theia-hq/nauthy) decides who gets in: capability tokens rooted in your key,
 checked offline against the key that dialed. The trust is in the math, and the math is standard: ed25519
@@ -141,9 +143,11 @@ Every layer is a library you can build on. Two ready-made nodes:
 ## Compared to what you already use
 
 - **vs Tailscale (rented) or headscale (self-hosted).** Both give you reach and identity, with a control
-  plane you rent or operate: a server, a database of who belongs, state to secure and back up. Here there
-  is no control plane. The grant goes further: scoped to one service, expiring, revocable, checked offline
-  against the key that dialed. A bare grant can be handed on; a bound one cannot.
+  plane you rent or operate: a server, a database of who belongs, state to secure and back up. Here no
+  server decides who belongs: admission is a signature your own machine checks against the key that
+  dialed. A node can serve a signed list of your own devices, but nothing grants from a list. Finding a
+  peer still leans on n0's public discovery and relays. The grant goes further: scoped to one service,
+  expiring, revocable, checked offline. A bare grant can be handed on; a bound one cannot.
 - **vs ngrok and Cloudflare Tunnel.** Both give HTTP ingress: TLS, domains, and browser access, plus a free
   tier. The edge sits in the vendor's trust path. The service is theirs to cut. Here the service runs on
   your machine behind your key. The endpoint is a key, not a rented hostname.
@@ -167,7 +171,10 @@ is refused, and a session already open is not cut.
 
 **Finding a peer and the relay fallback are iroh's.** A serving node publishes where it can be reached to
 n0's public discovery service, and when a direct path fails, n0's public relays forward encrypted bytes.
-Neither can read traffic or admit anyone. Both can see who talks to whom, and both can go away. Pointing
-swoosh at a relay and a resolver you run is not wired today.
+Neither can read traffic or admit anyone. Both can see who talks to whom, and both can go away. swoosh
+takes `--relay` and `--resolver` for a relay and a resolver you run yourself
+([Transports](https://github.com/theia-hq/swoosh/blob/v0.12.0/docs/transports.md)); each needs a host
+with a certificate the public trusts. We have not run that path end to end.
 
-**Early software.** Wire protocols, CLIs, and identity formats will change; not for production yet.
+**Early software.** Wire protocols, CLIs, and identity formats change without notice; not for
+production yet.
