@@ -6,7 +6,7 @@
 | `logo.svg`, `logo-white.svg` | the mark and the name, black or white, transparent background |
 | `icon-512.png`, `icon-white-512.png` | the mark at 512 px |
 | `logo@2x.png`, `logo-white@2x.png` | the mark and the name at 1790 by 410 px |
-| `avatar.png` | the white mark on black, 1024 px, for the org avatar |
+| `avatar.png`, `avatar-light.png` | the org avatar, 1024 px: the white mark on black, or the black mark on white |
 | `favicon.ico`, `favicon-32.png` | the mark at 16, 32 and 48 px |
 | `apple-touch-icon.png` | the black mark on white, 180 px |
 | `social-card.png`, `social-card-light.png` | 1280 by 640 px link preview, dark or light |
